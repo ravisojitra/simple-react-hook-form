@@ -15,17 +15,57 @@ npm install --save simple-react-hook-form
 ```jsx
 import React, { Component } from 'react'
 
-import MyComponent from 'simple-react-hook-form'
-import 'simple-react-hook-form/dist/index.css'
+import useForm from 'simple-react-hook-form'
+import * as yup from 'yup'
 
-class Example extends Component {
-  render() {
-    return <MyComponent />
+let initialValues = { name: 'React' }
+const validationSchema = yup.object().shape({
+  name: yup
+    .string()
+    .min(5, 'Name must be minimum of length 5')
+    .required('Name is required')
+})
+const App = () => {
+  const {
+    handleChange,
+    resetForm,
+    clearForm,
+    values,
+    handleSubmit,
+    errors
+  } = useForm(initialValues, {
+    validate: true,
+    validateSchema: validationSchema,
+    validationOnChange: true
+  })
+
+  const onSubmit = () => {
+    console.log('form is valid, Do what you gotta do!')
   }
+  return (
+    <div className='App'>
+      <form>
+        <div>
+          <label htmlFor={'Name'}>{'Name'}</label>
+          <input
+            onChange={(e) => handleChange('name', e.currentTarget.value)}
+            name={'name'}
+            placeholder={'Please enter name'}
+            type={'text'}
+            value={values.name}
+          />
+          {errors.name && <p className='errorText'>{errors.name.join('\n')}</p>}
+        </div>
+
+        <button type='button' onClick={() => handleSubmit(onSubmit)}>
+          Submit
+        </button>
+      </form>
+    </div>
+  )
 }
 ```
 
 ## License
 
 MIT © [ravisojitra](https://github.com/ravisojitra)
-# simple-react-hook-form
