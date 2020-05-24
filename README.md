@@ -4,6 +4,8 @@
 
 [![NPM](https://img.shields.io/npm/v/simple-react-hook-form.svg)](https://www.npmjs.com/package/simple-react-hook-form) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
+[![Edit nostalgic-cookies-xmq8g](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/nostalgic-cookies-xmq8g?fontsize=14&hidenavigation=1&theme=dark)
+
 ## Install
 
 ```bash
