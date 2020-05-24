@@ -1,6 +1,6 @@
 {
   "name": "simple-react-hook-form",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple form library for react.js and react native using hooks + Yup",
   "author": "ravisojitra",
   "license": "MIT",
