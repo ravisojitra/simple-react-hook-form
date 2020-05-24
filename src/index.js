@@ -58,15 +58,15 @@ const useForm = (initialValues = {}, config = { ...defaultConfig }) => {
     }
   }, [state.values, validationOnChange])
 
-  React.useEffect(() => {
-    async function checkForm() {
-      if (await validateForm()) {
-        onSubmit();
-      }
-    }
+  // React.useEffect(() => {
+  //   async function checkForm() {
+  //     if (await validateForm()) {
+  //       onSubmit();
+  //     }
+  //   }
 
-    state.isSubmitted && checkForm()
-  }, [state.submitCounter, state.isSubmitted])
+  //   state.isSubmitted && checkForm()
+  // }, [state.submitCounter, state.isSubmitted])
 
   const validateForm = async () => {
     let { isValid, errors } = await getValidationErrors();
@@ -127,9 +127,9 @@ const useForm = (initialValues = {}, config = { ...defaultConfig }) => {
   const handleSubmit = useCallback(async (onSubmit) => {
     if (validate) {
       dispatch({ type: 'SUBMIT_FORM' })
-      // if (await validateForm()) {
-      //   onSubmit();
-      // }
+      if (await validateForm()) {
+        onSubmit();
+      }
     } else {
       onSubmit();
     }
