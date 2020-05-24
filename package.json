@@ -1,7 +1,7 @@
 {
   "name": "simple-react-hook-form",
   "version": "1.0.0",
-  "description": "A simple form library for react.js and react native using hooks",
+  "description": "A simple form library for react.js and react native using hooks + Yup",
   "author": "ravisojitra",
   "license": "MIT",
   "repository": "ravisojitra/simple-react-hook-form",
@@ -49,5 +49,8 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+  "dependencies": {
+    "yup": "^0.29.0"
+  }
 }
