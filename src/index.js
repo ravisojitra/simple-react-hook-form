@@ -27,6 +27,8 @@ const reducer = (state, { type, payload }) => {
         ...state,
         errors
       }
+    case 'SET_VALUES':
+      return { ...state, values: { ...payload.values } }
     case 'RESET_FORM':
       return { ...payload, errors: {} }
     case 'SUBMIT_FORM':
@@ -124,6 +126,15 @@ const useForm = (initialValues = {}, config = { ...defaultConfig }) => {
     })
   })
 
+  const setValues = values => {
+    dispatch({
+      type: 'SET_VALUES',
+      payload: {
+        ...values
+      }
+    })
+  }
+
   const handleSubmit = useCallback(async (onSubmit) => {
     if (validate) {
       dispatch({ type: 'SUBMIT_FORM' })
@@ -135,7 +146,7 @@ const useForm = (initialValues = {}, config = { ...defaultConfig }) => {
     }
   });
 
-  return { handleChange, resetForm, handleSubmit, clearForm, ...state }
+  return { handleChange, resetForm, handleSubmit, clearForm, setValues, ...state }
 }
 
 export default useForm;
