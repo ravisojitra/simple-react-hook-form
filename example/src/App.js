@@ -45,7 +45,7 @@ const App = () => {
 
   const initialValues = useMemo(() => {
     return {
-      name: 'Ravi',
+      name: {firstName:'Ravi'},
       email: '',
       title: '',
       website: ''
@@ -60,9 +60,8 @@ const App = () => {
       validationOnChange: true
     }
   );
-
-  const onSubmit = () => {
-    console.log("form is valid, Do what you gotta do!");
+  const onSubmit = (data) => {
+    console.log("form is valid, Do what you gotta do!",data);
   }
 
   return (
@@ -72,9 +71,9 @@ const App = () => {
         <Input
           label={'Full Name'}
           placeholder={'Ravi Sojitra'}
-          onChange={(value) => handleChange('name', value)}
-          value={values.name}
-          error={errors.name}
+          onChange={(value) => handleChange('name.firstName', value)}
+          value={values.name?.firstName}
+          error={errors.name?.firstName}
         />
 
         <Input

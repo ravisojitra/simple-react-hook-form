@@ -1,13 +1,18 @@
+/* eslint-disable promise/param-names */
+/* eslint-disable no-case-declarations */
 import React, { useReducer, useCallback } from 'react'
+import set from 'lodash/set'
+import get from 'lodash/get'
+import cloneDeep from 'lodash/cloneDeep'
 
-const getInitialState = initialValues => {
+const getInitialState = (initialValues) => {
   return {
     values: {
       ...initialValues
     },
     errors: {}, // all errors
     touched: {}, // dirty field names
-    isSubmitted: false, //is form submitted to check validation
+    isSubmitted: false, // is form submitted to check validation
     submitCounter: 0
   }
 }
@@ -15,14 +20,17 @@ const getInitialState = initialValues => {
 const reducer = (state, { type, payload }) => {
   switch (type) {
     case 'INPUT_CHANGE':
-      let inputKey = payload.key, inputValue = payload.value;
+      const inputKey = payload.key
+      const inputValue = payload.value
+      const values = cloneDeep(state.values)
+      const touched = cloneDeep(state.touched)
       return {
         ...state,
-        values: { ...state.values, [inputKey]: inputValue },
-        touched: { ...state.touched, [inputKey]: true }
+        values: set(values, inputKey, inputValue),
+        touched: set(touched, inputKey, true)
       }
     case 'VALIDATE_FORM':
-      let errors = payload.errors || {}
+      const errors = payload.errors || {}
       return {
         ...state,
         errors
@@ -32,31 +40,35 @@ const reducer = (state, { type, payload }) => {
     case 'RESET_FORM':
       return { ...payload, errors: {} }
     case 'SUBMIT_FORM':
-      return { ...state, isSubmitted: true, submitCounter: ++state.submitCounter }
+      return {
+        ...state,
+        isSubmitted: true,
+        submitCounter: ++state.submitCounter
+      }
     case 'CLEAR_FORM':
       return { ...state, values: { ...payload.values }, errors: {} }
     default:
-      return state;
+      return state
   }
 }
 
 const defaultConfig = {
-  validate: true, //should validate form?
-  validationOnChange: false, //should form validate on blur input
-  validateSchema: false //yup validation schema
+  validate: true, // should validate form?
+  validationOnChange: false, // should form validate on blur input
+  validateSchema: false // yup validation schema
 }
 
 const useForm = (initialValues = {}, config = { ...defaultConfig }) => {
-  let initalState = getInitialState(initialValues);
-  const [state, dispatch] = useReducer(reducer, initalState);
-  const { validate, validationOnChange, validateSchema } = config;
+  const initalState = getInitialState(initialValues)
+  const [state, dispatch] = useReducer(reducer, initalState)
+  const { validate, validationOnChange, validateSchema } = config
 
   React.useEffect(() => {
     async function checkForm() {
-      await validateForm();
+      await validateForm()
     }
     if (validationOnChange && state.isSubmitted) {
-      checkForm();
+      checkForm()
     }
   }, [state.values, validationOnChange])
 
@@ -71,26 +83,31 @@ const useForm = (initialValues = {}, config = { ...defaultConfig }) => {
   // }, [state.submitCounter, state.isSubmitted])
 
   const validateForm = async () => {
-    let { isValid, errors } = await getValidationErrors();
-    dispatch({ type: 'VALIDATE_FORM', payload: { errors } });
-    return isValid;
+    const { isValid, errors } = await getValidationErrors()
+    dispatch({ type: 'VALIDATE_FORM', payload: { errors } })
+    return isValid
   }
 
   const getValidationErrors = () => {
     return new Promise((resolve, _) => {
       if (validateSchema) {
         try {
-          let isValid = validateSchema.validateSync(state.values, { abortEarly: false });
+          const isValid = validateSchema.validateSync(state.values, {
+            abortEarly: false
+          })
           resolve({ isValid, errors: {} })
         } catch (err) {
-          let errors = {};
+          const errors = {}
+
           err.inner.forEach((yupErr) => {
-            if (errors[yupErr.path]) {
-              errors[yupErr.path].push(yupErr.message);
+            const currentErr = get(errors, yupErr.path)
+            if (currentErr) {
+              set(errors, yupErr.path, [...currentErr, yupErr.message])
             } else {
-              errors[yupErr.path] = [yupErr.message];
+              set(errors, yupErr.path, [yupErr.message])
             }
-          });
+          })
+          console.log({ errors })
           resolve({ isValid: false, errors })
         }
       } else {
@@ -103,7 +120,7 @@ const useForm = (initialValues = {}, config = { ...defaultConfig }) => {
     dispatch({
       type: 'INPUT_CHANGE',
       payload: { key, value }
-    });
+    })
   })
 
   const resetForm = useCallback(() => {
@@ -113,11 +130,13 @@ const useForm = (initialValues = {}, config = { ...defaultConfig }) => {
         ...initalState
       }
     })
-  }, [initalState]);
+  }, [initalState])
 
   const clearForm = useCallback(() => {
-    let oldValues = { ...state.values }
-    let values = Object.keys(oldValues).forEach(function (key) { oldValues[key] = "" });
+    const oldValues = { ...state.values }
+    const values = Object.keys(oldValues).forEach(function (key) {
+      oldValues[key] = ''
+    })
     dispatch({
       type: 'CLEAR_FORM',
       payload: {
@@ -126,7 +145,7 @@ const useForm = (initialValues = {}, config = { ...defaultConfig }) => {
     })
   })
 
-  const setValues = values => {
+  const setValues = (values) => {
     dispatch({
       type: 'SET_VALUES',
       payload: {
@@ -139,14 +158,21 @@ const useForm = (initialValues = {}, config = { ...defaultConfig }) => {
     if (validate) {
       dispatch({ type: 'SUBMIT_FORM' })
       if (await validateForm()) {
-        onSubmit();
+        onSubmit(state.values)
       }
     } else {
-      onSubmit();
+      onSubmit(state.values)
     }
-  });
+  })
 
-  return { handleChange, resetForm, handleSubmit, clearForm, setValues, ...state }
+  return {
+    handleChange,
+    resetForm,
+    handleSubmit,
+    clearForm,
+    setValues,
+    ...state
+  }
 }
 
-export default useForm;
+export default useForm
